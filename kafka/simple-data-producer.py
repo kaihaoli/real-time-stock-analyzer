@@ -9,13 +9,17 @@ import logging
 import atexit
 import schedule
 
+# Google Finance Real Time Data
+from googlefinance import getQuotes
+
 # Import kafka python client
 from kafka import KafkaProducer
 from kafka.errors import KafkaError, KafkaTimeoutError
 
 # Kafka
 # - default kafka topic to write to
-topic_name = 'stock-analyzer'
+topic_name = 'test'
+#'stock-analyzer'
 # - default kafka broker location
 kafka_broker = '192.168.99.100:9092'
 #'127.0.0.1:9092'
@@ -36,18 +40,19 @@ def fetch_stock_price(producer, symbol):
     """
     logger.debug('Start to fetch stock price for %s', symbol)
     try:
-        # price = json.dumps(getQuotes(symbol))
-
+        # payload = price = json.dumps(getQuotes(symbol))
         price = random.randint(30, 120) # random price
         timestamp = datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%dT%H:%MZ')
-        payload = ('[{"StockSymbol":"AAPL","LastTradePrice":%d,"LastTradeDateTime":"%s"}]' % (price, timestamp)).encode('utf-8')
+        payload = ('[{"StockSymbol":%s,"LastTradePrice":%d,"LastTradeDateTime":"%s"}]' % (symbol, price, timestamp)).encode('utf-8')
 
         logger.debug('Retrieved stock info %s', price)
-        producer.send(topic=topic_name, value=payload, timestamp_ms=time.time())
+        future = producer.send(topic=topic_name, value=payload)
+        #future = producer.send(topic=topic_name, value=payload, timestamp_ms=time.time())
         logger.debug('Sent stock price for %s to Kafka', symbol)
     except KafkaTimeoutError as timeout_error:
         logger.warn('Failed to send stock price for %s to kafka, caused by: %s', (symbol, timeout_error.message))
     except Exception:
+        print Exception
         logger.warn('Failed to fetch stock price for %s', symbol)
 
 def shutdown_hook(producer):
@@ -78,11 +83,18 @@ if __name__ == '__main__':
     )
 
     # 2 Schedule and run the fetch_stock_price function every second
-    schedule.every(10).second.do(fetch_stock_price, producer, symbol)
+    schedule.every(1).second.do(fetch_stock_price, producer, symbol)
 
     # 3 Setup proper shutdown hook
     atexit.register(shutdown_hook, producer)
 
     while True:
         schedule.run_pending()
-        time.sleep(10)
+        time.sleep(1)
+'''
+    for _ in range(10):
+        future = producer.send(topic='test', value=b'some_message_bytes')
+        #future = producer.send('foobar', b'another_message')
+        result = future.get(timeout=60)
+        print result
+'''
