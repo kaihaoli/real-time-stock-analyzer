@@ -12,7 +12,7 @@ MACHINE_NAME=$1
 IP=$(docker-machine ip ${MACHINE_NAME})
 
 #
-# - run a single zookeeper broker
+# - 1 run a single zookeeper broker
 #
 echo "start zookeeper"
 
@@ -50,7 +50,7 @@ fi
 sleep 2
 
 #
-# - run the kafka broker
+# - 2 run the kafka broker
 #
 echo "start kafka"
 RUNNING=$(docker inspect --format="{{ .State.Running }}" kafka 2> /dev/null)
@@ -78,4 +78,31 @@ elif [[ ${RUNNING} == "false" ]]; then
     # - otherwise, container exists but not running, start it
     #
     docker start kafka
+fi
+
+#
+# - 3 run the cassandra
+#
+echo "start cassandra"
+RUNNING=$(docker inspect --format="{{ .State.Running }}" cassandra 2> /dev/null)
+if [[ $? -eq 1 ]]; then
+
+    #
+    # - cannot find docker container named cassandra, create one
+    # - for docker run command options, see: https://docs.docker.com/engine/reference/run/
+    #
+    docker run \
+        -d \
+        -p 7199:7199 \
+        -p 9042:9042 \
+        -p 9160:9160 \
+        -p 7001:7001 \
+        --name cassandra \
+        cassandra:3.7
+elif [[ ${RUNNING} == "false" ]]; then
+
+    #
+    # - otherwise, container exists but not running, start it
+    #
+    docker start cassandra
 fi

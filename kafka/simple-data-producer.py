@@ -8,6 +8,7 @@ import random
 import logging
 import atexit
 import schedule
+import json
 
 # Google Finance Real Time Data
 from googlefinance import getQuotes
@@ -40,11 +41,12 @@ def fetch_stock_price(producer, symbol):
     """
     logger.debug('Start to fetch stock price for %s', symbol)
     try:
-        # payload = price = json.dumps(getQuotes(symbol))
+        #payload = price = json.dumps(getQuotes(symbol))
         price = random.randint(30, 120) # random price
         timestamp = datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%dT%H:%MZ')
-        payload = ('[{"StockSymbol":%s,"LastTradePrice":%d,"LastTradeDateTime":"%s"}]' % (symbol, price, timestamp)).encode('utf-8')
-
+        val = {"StockSymbol": symbol, "LastTradePrice":price, "LastTradeDateTime":timestamp}
+        payload = json.dumps(val, encoding="utf-8")
+        #payload = json.dumps(('[{"StockSymbol":%s,"LastTradePrice":%d,"LastTradeDateTime":"%s"}]' % (symbol, price, timestamp)).encode('utf-8'))
         logger.debug('Retrieved stock info %s', price)
         future = producer.send(topic=topic_name, value=payload)
         #future = producer.send(topic=topic_name, value=payload, timestamp_ms=time.time())
