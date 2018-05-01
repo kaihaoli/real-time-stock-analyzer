@@ -9,3 +9,8 @@
 
 * [cassandra-driver](https://github.com/datastax/python-driver)
   * A modern, feature-rich and highly-tunable Python client library for Apache Cassandra (2.1+) using exclusively Cassandra's binary protocol and Cassandra Query Language v3.
+
+  ## Virtual env
+  ```bash
+  > eval $(docker-machine env bigdata)
+  ```
