@@ -67,9 +67,9 @@ def process_stream(stream):
 
 if __name__ == '__main__':
     # Kafka Configuration
-    # "stock-analyzer", "average-stock-price"
-    topic = "test"
-    target_topic = "stock-analyzer"
+    # "stock-analyzer",
+    topic = "stock-analyzer"
+    target_topic = "average-stock-price"
     brokers = "192.168.99.100:9092"
 
     # Spark

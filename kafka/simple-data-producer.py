@@ -19,8 +19,8 @@ from kafka.errors import KafkaError, KafkaTimeoutError
 
 # Kafka
 # - default kafka topic to write to
-topic_name = 'test'
-#'stock-analyzer'
+topic_name = 'stock-analyzer'
+# 'test'
 # - default kafka broker location
 kafka_broker = '192.168.99.100:9092'
 #'127.0.0.1:9092'
@@ -93,10 +93,3 @@ if __name__ == '__main__':
     while True:
         schedule.run_pending()
         time.sleep(1)
-'''
-    for _ in range(10):
-        future = producer.send(topic='test', value=b'some_message_bytes')
-        #future = producer.send('foobar', b'another_message')
-        result = future.get(timeout=60)
-        print result
-'''
